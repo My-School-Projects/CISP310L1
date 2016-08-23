@@ -4,6 +4,20 @@ using std::cout;
 using std::endl;
 using std::flush;
 
+/**
+ * Questions:
+ * 1. Q: What are the smallest negative decimal number and largest positive decimal
+ *       number that can be stored in 16 bits using 2's complement format? Why?
+ *    A: -32768, 32767. Because one bit is used for the sign, and 2^15 = 32768.
+ *       The positive range appears to be one smaller, because it includes 0.
+ * 2. Q: In C++, what procedure or operator allows you to extract a single character from a string?
+ *    A: operator[]
+ * 3. Q: In C++, what procedure or operator lets you concatenate characters into a single string?
+ *    A: operator+
+ * 4. Q: In C++, what procedure or operator lets you replace a character in a string with a different character?
+ *    A: operator[]
+ */
+
 class bin16_t {
 private:
     char value[17]; // 16 + NULL
