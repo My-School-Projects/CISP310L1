@@ -42,7 +42,7 @@ public:
     }
     bin16_t() {
         for (int i = 0; i < 17; ++i) {
-            value[i] = NULL;
+            value[i] = 0;
         }
     }
 };
