@@ -30,7 +30,12 @@ public:
         }
     }
     std::string get_string() {
-        return value;
+        std::string v = value;
+        // add a space every four bits
+        return v.substr(0, 4) + " "
+             + v.substr(4, 4) + " "
+             + v.substr(8, 4) + " "
+             + v.substr(12);
     }
     static bool in_range(int64_t value) {
         return value >= -32768 && value < 32768;
