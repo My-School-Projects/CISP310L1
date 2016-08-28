@@ -95,33 +95,74 @@ long minimumNegativeValue() {
 
 // convert signed integer into string showing its 2's complement binary representation
 string convertDecimalToBinaryString(int decimalValue) {
-	// s = "xxxxxxxx..." with SIZE 'x's
-	string s(SIZE, 'x');
-    for (int i = 0; i < SIZE; ++i) {
+	// binaryString = "xxxxxxxx..." with SIZE 'x's
+	string binaryString(SIZE, 'x');
+
+	/**
+	 * All positive integer values can be thought of as sums of powers of two.
+	 * Eg. 100 = 64+32+4 = 2^6 + 2^5 + 2^2
+	 * This algorithm will iteratively subtract these terms, largest to smallest.
+	 */
+
+	// This algorithm only works on positive values, so we need to take the absolute value
+	// and store the sign for later, where we will do 2's complement on negative values.
+	
+	// True if decimalValue is negative, otherwise false.
+	bool negative = decimalValue < 0;
+
+	decimalValue = abs(decimalValue);
+
+	// remainingMagnitude will represent the value which is left over after each
+	// iterative subtraction.
+	int remainingMagnitude = decimalValue;
+
+    for (int i = SIZE-1; i >= 0; --i) {
 		char bit;
-		// shift bits to the right i spaces
-		// eg. given decimalValue = 0101 0010b, i = 3
-		// shiftedRight = 0000 1010b
-		short shiftedRight = (decimalValue >> i);
-		// perform bitwize AND with 0000 0001b
-		// REASON: This isolates the last bit of decimalValue, once it's been shifted i bits.
-		// Because i goes from 0 to SIZE-1, this isolates each bit of the integer.
-		int currentBit = shiftedRight & 1;
-		if (currentBit == 1) {
+		// Check if 2^i fits inside of remainingMagnitude
+		if (remainingMagnitude >= pow(2, i)) {
+			// If so, subtract 2^1 from remainingMagnitude, and make the current bit a 1
+			remainingMagnitude -= pow(2, i);
 			bit = '1';
 		} else {
+			// Otherwise, remainingMagnitude will stay the same, and the current bit will be 0
 			bit = '0';
 		}
-		int x = SIZE-1-i;
-        s[x] = bit;
+		// Get the index of current bit
+		int index = SIZE-1-i;
+		// Add the current bit to binaryString
+        binaryString[index] = bit;
     }
+
+	// Convert to 2's complement if negative
+	if (negative) {
+		// Flip all the bits
+		for (int i = 0; i < SIZE; ++i) {
+			if (binaryString[i] == '0') {
+				binaryString[i] = '1';
+			} else {
+				binaryString[i] = '0';
+			}
+		}
+		// Add 1
+		// Iterate over binaryString in reverse order, flipping all '1's to '0's,
+		// until a '0' is encountered. Upon encountering a '0', flip it to '1' and break.
+		for (int i = SIZE-1; i >= 0; --i) {
+			if (binaryString[i] == '1') {
+				binaryString[i] = '0';
+			} else {
+				binaryString[i] = '1';
+				break;
+			}
+		}
+	}
+
 	// add a space every four bits
 	// substr(x, 4) starts at character x and gets the next 4 characters
-	s = s.substr(0, 4) + " "
-        + s.substr(4, 4) + " "
-        + s.substr(8, 4) + " "
-        + s.substr(12);
-	return s;
+	binaryString = binaryString.substr(0, 4) + " "
+        + binaryString.substr(4, 4) + " "
+        + binaryString.substr(8, 4) + " "
+        + binaryString.substr(12);
+	return binaryString;
 }
 
 // true if value can fit in a signed integer with SIZE bits
