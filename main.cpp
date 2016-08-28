@@ -157,12 +157,12 @@ string convertDecimalToBinaryString(int decimalValue) {
 	}
 
 	// add a space every four bits
-	// substr(x, 4) starts at character x and gets the next 4 characters
-	binaryString = binaryString.substr(0, 4) + " "
-        + binaryString.substr(4, 4) + " "
-        + binaryString.substr(8, 4) + " "
-        + binaryString.substr(12);
-	return binaryString;
+	// substr(i, 4) starts at character i and gets the next 4 characters
+	string binaryStringWithSpaces;
+	for (int i = 0; i < SIZE; i += 4) {
+		binaryStringWithSpaces += binaryString.substr(i, 4) + " ";
+	}
+	return binaryStringWithSpaces;
 }
 
 // true if value can fit in a signed integer with SIZE bits
