@@ -30,6 +30,39 @@ long maximumPositiveValue();
 long minimumNegativeValue();
 string convertDecimalToBinaryString(int);
 bool in_range(int);
+int convertCharToInt(char);
+char getCarryFromThreeBitAdd(char, char, char);
+char getSumFromThreeBitAdd(char, char, char);
+string add(string, string);
+
+// Lookup tables for three bit addition
+
+// Say we are adding 0+1+1 binary.
+// This addition gives a sum bit of 0 and a carry bit of 1.
+
+// usage: sum = sumFromThreeBitAdd[0][1][1]; // sum: 0
+// usage: carry  =  carryFromThreeBitAdd[0][1][1]; //  carry: 1
+char carryFromThreeBitAdd[2][2][2] = {
+	'0', // 0+0+0
+	'0', // 0+0+1
+	'0', // 0+1+0
+	'1', // 0+1+1
+	'0', // 1+0+0
+	'1', // 1+0+1
+	'1', // 1+1+0
+	'1', // 1+1+1
+};
+
+char sumFromThreeBitAdd[2][2][2] = {
+	'0', // 0+0+0
+	'1', // 0+0+1
+	'1', // 0+1+0
+	'0', // 0+1+1
+	'1', // 1+0+0
+	'0', // 1+0+1
+	'0', // 1+1+0
+	'1', // 1+1+1
+};
 
 int main() {
 
@@ -143,17 +176,15 @@ string convertDecimalToBinaryString(int decimalValue) {
 				binaryString[i] = '0';
 			}
 		}
-		// Add 1
-		// Iterate over binaryString in reverse order, flipping all '1's to '0's,
-		// until a '0' is encountered. Upon encountering a '0', flip it to '1' and break.
-		for (int i = SIZE-1; i >= 0; --i) {
-			if (binaryString[i] == '1') {
-				binaryString[i] = '0';
-			} else {
-				binaryString[i] = '1';
-				break;
-			}
-		}
+		// Create a string representing the binary value 1
+		// Start with SIZE-1 0's (for SIZE=8, one = "0000000")
+		string one(SIZE-1, '0');
+		// Add a trailing 1
+		one += "1";
+		// Now, for SIZE=8, one = "00000001", which is 1 in 8-bit binary
+		
+		// Add 1 to binaryString
+		binaryString = add(binaryString, one);
 	}
 
 	// add a space every four bits
@@ -163,6 +194,48 @@ string convertDecimalToBinaryString(int decimalValue) {
 		binaryStringWithSpaces += binaryString.substr(i, 4) + " ";
 	}
 	return binaryStringWithSpaces;
+}
+
+string add(string binaryNumber1, string binaryNumber2) {
+	char carryBit = '0';
+	// Initialize sum to be "xxxxxx..." of length SIZE
+	string sum(SIZE, 'x');
+	// Iterate over numbers in reverse order
+	for (int i = SIZE-1; i >= 0; --i) {
+		sum[i] = getSumFromThreeBitAdd(binaryNumber1[i], binaryNumber2[i], carryBit);
+		carryBit = getCarryFromThreeBitAdd(binaryNumber1[i], binaryNumber2[i], carryBit);
+	}
+	return sum;
+}
+
+char getCarryFromThreeBitAdd(char bit1, char bit2, char bit3) {
+	// Convert bits to integers
+	int integerBit1 = convertCharToInt(bit1);
+	int integerBit2 = convertCharToInt(bit2);
+	int integerBit3 = convertCharToInt(bit3);
+
+	// Use the lookup table to find and return the carry
+	char carry = carryFromThreeBitAdd[integerBit1][integerBit2][integerBit3];
+	return carry;
+}
+
+char getSumFromThreeBitAdd(char bit1, char bit2, char bit3) {
+	// Convert bits to integers
+	int integerBit1 = convertCharToInt(bit1);
+	int integerBit2 = convertCharToInt(bit2);
+	int integerBit3 = convertCharToInt(bit3);
+
+	// Use the lookup table to find and return the carry
+	char sum = sumFromThreeBitAdd[integerBit1][integerBit2][integerBit3];
+	return sum;
+}
+
+int convertCharToInt(char c)  {
+	if (c == '1') {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 // true if value can fit in a signed integer with SIZE bits
