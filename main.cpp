@@ -33,7 +33,7 @@ bool in_range(int);
 int convertCharToInt(char);
 char getCarryFromThreeBitAdd(char, char, char);
 char getSumFromThreeBitAdd(char, char, char);
-string add(string, string);
+string addBinaryNumbers(string, string);
 
 // Lookup tables for three bit addition
 
@@ -184,7 +184,7 @@ string convertDecimalToBinaryString(int decimalValue) {
 		// Now, for SIZE=8, one = "00000001", which is 1 in 8-bit binary
 		
 		// Add 1 to binaryString
-		binaryString = add(binaryString, one);
+		binaryString = addBinaryNumbers(binaryString, one);
 	}
 
 	// add a space every four bits
@@ -196,16 +196,30 @@ string convertDecimalToBinaryString(int decimalValue) {
 	return binaryStringWithSpaces;
 }
 
-string add(string binaryNumber1, string binaryNumber2) {
+string addBinaryNumbers(string binaryNumber1, string binaryNumber2) {
 	char carryBit = '0';
 	// Initialize sum to be "xxxxxx..." of length SIZE
-	string sum(SIZE, 'x');
-	// Iterate over numbers in reverse order
+	string resultantSum(SIZE, 'x');
+	// Iterate over numbers in reverse order (LSB to MSB)
+	// Every iteration will add three bits for the current column (power of 2) in the binary addition.
+	// The top bit will be the carry bit from the previous column addition, the middle bit will come from
+	// binaryNumber2 and the bottom bit will come from binaryNumber1.
+	// We will store the result in this column of the resultantSum.
+	//
+	// eg. (using SIZE=4 bits, showing the second iteration of 10d + 6d)
+	//     store carry---v  v---read carry
+	//        carry:   0[1][0](0) <-- we seed the carry bit with 0
+	//          10d:   1 0 [1] 0
+	//           6d: + 0 1 [1] 0
+	//               -----------
+	// resultantSum:   x x [0] 0
+	//      store result ---^
 	for (int i = SIZE-1; i >= 0; --i) {
-		sum[i] = getSumFromThreeBitAdd(binaryNumber1[i], binaryNumber2[i], carryBit);
+		// Get the sum of binaryNumber1[i], binaryNumber[2] and carryBit using the lookup table
+		resultantSum[i] = getSumFromThreeBitAdd(binaryNumber1[i], binaryNumber2[i], carryBit);
 		carryBit = getCarryFromThreeBitAdd(binaryNumber1[i], binaryNumber2[i], carryBit);
 	}
-	return sum;
+	return resultantSum;
 }
 
 char getCarryFromThreeBitAdd(char bit1, char bit2, char bit3) {
@@ -231,11 +245,13 @@ char getSumFromThreeBitAdd(char bit1, char bit2, char bit3) {
 }
 
 int convertCharToInt(char c)  {
+	int integerValue;
 	if (c == '1') {
-		return 1;
+		integerValue = 1;
 	} else {
-		return 0;
+		integerValue = 0;
 	}
+	return integerValue;
 }
 
 // true if value can fit in a signed integer with SIZE bits
